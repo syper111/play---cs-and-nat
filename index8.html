@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار Packet Tracer</title>
+    <style>
+        :root { --primary: #2563eb; --success: #22c55e; --error: #ef4444; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: var(--primary); }
+        .question { font-size: 1.2rem; margin-bottom: 1.5rem; }
+        .options button { display: block; width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; transition: 0.3s; text-align: right; }
+        .options button:hover { border-color: var(--primary); background: #eff6ff; }
+        #result-screen { text-align: center; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz">
+    <div class="stats">
+        <span>النتيجة: <span id="score">0</span></span>
+        <span>الأخطاء: <span id="errors">0</span></span>
+    </div>
+    <div id="question-area">
+        <div class="question" id="question-text"></div>
+        <div class="options" id="options-area"></div>
+    </div>
+    <div id="result-screen">
+        <h2 id="final-message"></h2>
+        <p>نتيجتك النهائية: <span id="final-score"></span>/12</p>
+        <button onclick="location.reload()">إعادة الاختبار</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "ما هو التعريف الأدق لبرنامج Packet Tracer؟", a: ["برنامج لتصفح الإنترنت", "برنامج محاكاة للشبكات", "برنامج لتطوير أنظمة التشغيل"], correct: 1 },
+        { q: "من هي الجهة التي قامت بتطوير برنامج Packet Tracer؟", a: ["Microsoft", "Cisco Systems", "Google"], correct: 1 },
+        { q: "أي مما يلي يعتبر من أهم فوائد استخدام Packet Tracer؟", a: ["استبدال الأجهزة الحقيقية", "تجربة إعدادات الشبكة دون التأثير على أجهزة حقيقية", "سرعة تصفح المواقع"], correct: 1 },
+        { q: "ما هو المكون الذي يحتوي على أنواع الأجهزة المختلفة؟", a: ["قائمة الأجهزة", "مساحة العمل", "شريط الأدوات"], correct: 0 },
+        { q: "ما هي الوظيفة الأساسية لمساحة العمل (Workspace)؟", a: ["حفظ ملفات النظام", "سحب وإفلات الأجهزة وتصميم الشبكة", "التحكم في الصوت"], correct: 1 },
+        { q: "ما هو الجهاز الذي يُستخدم لربط مجموعة من أجهزة الحاسوب؟", a: ["الطابعة", "المبدل (Switch)", "شاشة العرض"], correct: 1 },
+        { q: "ما هي الخطوة التي تلي توصيل الأجهزة بالكابلات؟", a: ["حذف الأجهزة", "إعطاء كل جهاز عنوان IP", "إغلاق البرنامج"], correct: 1 },
+        { q: "ما هي الأداة التي نستخدمها لاختبار الاتصال؟", a: ["أداة Ping", "أداة التكبير", "أداة الحذف"], correct: 0 },
+        { q: "لماذا نعتبر Packet Tracer وسيلة لتوفير الوقت والجهد؟", a: ["يغنينا عن تعلم المبادئ النظرية", "إنشاء الشبكات دون الحاجة لأجهزة مادية", "تصميم الشبكة تلقائياً"], correct: 1 },
+        { q: "ماذا يُقصد بعنوان IP؟", a: ["رقم تعريفي فريد لكل جهاز", "اسم الشركة المصنعة", "سرعة المعالج"], correct: 0 },
+        { q: "إذا أردنا إضافة جهاز حاسوب ثالث للشبكة، أين نذهب؟", a: ["قائمة إعدادات الصوت", "قائمة الأجهزة (Devices)", "قائمة الكابلات"], correct: 1 },
+        { q: "ما الهدف من التقاط صورة للشبكة؟", a: ["التباهي أمام الزملاء", "توثيق نجاح تصميم الشبكة", "مسح ملفات البرنامج"], correct: 1 }
+    ];
+
+    let currentQ = 0, score = 0, errors = 0;
+
+    function loadQuestion() {
+        if(currentQ >= quizData.length) return showResults();
+        const data = quizData[currentQ];
+        document.getElementById('question-text').innerText = (currentQ + 1) + ". " + data.q;
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        data.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i);
+            area.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(i) {
+        if(i === quizData[currentQ].correct) { score++; document.getElementById('score').innerText = score; }
+        else { errors++; document.getElementById('errors').innerText = errors; }
+        currentQ++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById('question-area').style.display = 'none';
+        const screen = document.getElementById('result-screen');
+        screen.style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        let msg = score > 10 ? "ممتاز! مستوى احترافي" : (score > 7 ? "جيد جداً، أداء رائع" : "جيد، استمر في التعلم");
+        document.getElementById('final-message').innerText = msg;
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
